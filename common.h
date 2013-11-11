@@ -19,12 +19,13 @@
 
 #include <stdio.h>
 #include <sys/stat.h>
-
+#include <fs_mgr.h>
 //#define MENU_TEXT_COLOR 255, 160, 49, 255
 #define MENU_TEXT_COLOR 0, 191, 255, 255
 #define MENU_TEXT_COLOR_RED 255, 0, 0, 255
 #define NORMAL_TEXT_COLOR 200, 200, 200, 255
 #define HEADER_TEXT_COLOR NORMAL_TEXT_COLOR
+
 
 // Initialize the graphics system.
 void ui_init();
@@ -32,6 +33,7 @@ void ui_init();
 // Use KEY_* codes from <linux/input.h> or KEY_DREAM_* from "minui/minui.h".
 void ui_cancel_wait_key();
 int ui_wait_key();            // waits for a key/button press, returns the code
+int ui_wait_key_with_repeat();
 int ui_key_pressed(int key);  // returns >0 if the code is currently pressed
 int ui_text_visible();        // returns >0 if text log is currently visible
 int ui_text_ever_visible();   // returns >0 if text log was ever visible
@@ -53,10 +55,15 @@ int ui_get_text_cols();
 void ui_increment_frame();
 void ui_setMenuTextColor(int r, int g, int b, int a);
 
+#ifdef ENABLE_LOKI
+// Toggle for loki support
+extern int loki_support_enabled;
+#endif
+
 // Display some header text followed by a menu of items, which appears
 // at the top of the screen (in place of any scrolling ui_print()
 // output, if necessary).
-int ui_start_menu(char** headers, char** items, int initial_selection);
+int ui_start_menu(const char** headers, char** items, int initial_selection);
 // Set the menu highlight to the given index, and return it (capped to
 // the range [0..numitems).
 int ui_menu_select(int sel);
@@ -67,12 +74,20 @@ void ui_end_menu();
 int ui_get_showing_back_button();
 void ui_set_showing_back_button(int showBackButton);
 
+void ui_set_log_stdout(int enabled);
+int ui_should_log_stdout();
+
+int ui_get_rainbow_mode();
+void ui_rainbow_mode();
+void ui_set_rainbow_mode(int rainbowMode);
+
 // Set the icon (normally the only thing visible besides the progress bar).
 enum {
   BACKGROUND_ICON_NONE,
   BACKGROUND_ICON_INSTALLING,
   BACKGROUND_ICON_ERROR,
   BACKGROUND_ICON_CLOCKWORK,
+  BACKGROUND_ICON_CID,
   BACKGROUND_ICON_FIRMWARE_INSTALLING,
   BACKGROUND_ICON_FIRMWARE_ERROR,
   NUM_BACKGROUND_ICONS
@@ -117,35 +132,8 @@ void ui_reset_progress();
 #define STRINGIFY(x) #x
 #define EXPAND(x) STRINGIFY(x)
 
-typedef struct {
-    const char* mount_point;  // eg. "/cache".  must live in the root directory.
+typedef struct fstab_rec Volume;
 
-    const char* fs_type;      // "yaffs2" or "ext4" or "vfat"
-
-    const char* device;       // MTD partition name if fs_type == "yaffs"
-                              // block device if fs_type == "ext4" or "vfat"
-
-    const char* device2;      // alternative device to try if fs_type
-                              // == "ext4" or "vfat" and mounting
-                              // 'device' fails
-
-    long long length;         // (ext4 partition only) when
-                              // formatting, size to use for the
-                              // partition.  0 or negative number
-                              // means to format all but the last
-                              // (that much).
-
-    const char* fs_type2;
-
-    const char* fs_options;
-
-    const char* fs_options2;
-
-    const char* lun;          // (/sdcard, /emmc, /external_sd only) LUN file to
-                              // use when mounting via USB mass storage
-
-    struct stat stat;
-} Volume;
 
 typedef struct {
     // number of frames in indeterminate progress bar animation

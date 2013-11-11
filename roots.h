@@ -41,6 +41,11 @@ int ensure_path_unmounted(const char* path);
 // it is mounted.
 int format_volume(const char* volume);
 
+char* get_primary_storage_path();
+char** get_extra_storage_paths();
+char* get_android_secure_path();
+void setup_legacy_storage_paths();
+int get_num_extra_volumes();
 int get_num_volumes();
 
 Volume* get_device_volumes();
@@ -50,5 +55,9 @@ void setup_data_media();
 int is_data_media_volume_path(const char* path);
 void handle_data_media_format(int handle);
 void handle_truedualsystem_format(int handle);
+void ignore_data_media_workaround(int ignore);
+
+#define MAX_NUM_MANAGED_VOLUMES 10
+
 
 #endif  // RECOVERY_ROOTS_H_
