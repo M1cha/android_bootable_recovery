@@ -910,7 +910,6 @@ int show_partition_menu()
         }
 
         if(strcmp("ramdisk", v->fs_type) != 0 && strcmp("mtd", v->fs_type) != 0 && strcmp("emmc", v->fs_type) != 0 && strcmp("bml", v->fs_type) != 0) {
-<<<<<<< HEAD
 
             int systemNumber = -1, dataNumber = -1;
             if(is_dualsystem()) {
@@ -939,14 +938,7 @@ int show_partition_menu()
             }
             mount_menu[mountable_volumes].v = &device_volumes[i];
             ++mountable_volumes;
-=======
-            if (strcmp("datamedia", v->fs_type) != 0) {
-                sprintf(mount_menu[mountable_volumes].mount, "mount %s", v->mount_point);
-                sprintf(mount_menu[mountable_volumes].unmount, "unmount %s", v->mount_point);
-                sprintf(mount_menu[mountable_volumes].path, "%s", v->mount_point);
-                ++mountable_volumes;
-            }
->>>>>>> remote.cm.cm-11.0
+
             if (is_safe_to_format(v->mount_point)) {
                 sprintf(format_menu[formatable_volumes].txt, "format %s", v->mount_point);
                 sprintf(format_menu[formatable_volumes].path, "%s", v->mount_point);
@@ -968,7 +960,6 @@ int show_partition_menu()
         for (i = 0; i < mountable_volumes; i++)
         {
             MountMenuEntry* e = &mount_menu[i];
-<<<<<<< HEAD
             Volume* v = e->v;
 
             if(is_dualsystem()) {
@@ -1021,10 +1012,6 @@ int show_partition_menu()
 
             if(is_path_mounted(v->mount_point))
                 options[i] = e->unmount;
-=======
-            if(is_path_mounted(e->path))
-                list[i] = e->unmount;
->>>>>>> remote.cm.cm-11.0
             else
                 list[i] = e->mount;
         }
@@ -1069,7 +1056,6 @@ int show_partition_menu()
         else if (chosen_item < mountable_volumes) {
             MountMenuEntry* e = &mount_menu[chosen_item];
 
-<<<<<<< HEAD
             if(is_dualsystem()) {
                 int systemNumber = -1, dataNumber = -1;
 
@@ -1107,9 +1093,6 @@ int show_partition_menu()
             }
 
             if (is_path_mounted(v->mount_point))
-=======
-            if (is_path_mounted(e->path))
->>>>>>> remote.cm.cm-11.0
             {
                 if (0 != ensure_path_unmounted(e->path))
                     ui_print("Error unmounting %s!\n", e->path);
@@ -1125,22 +1108,11 @@ int show_partition_menu()
             chosen_item = chosen_item - mountable_volumes;
             FormatMenuEntry* e = &format_menu[chosen_item];
 
-<<<<<<< HEAD
             if(is_dualsystem() && set_active_system(DUALBOOT_ITEM_BOTH)!=0) {
                 continue;
             }
 
             sprintf(confirm_string, "%s - %s", v->mount_point, confirm_format);
-=======
-            sprintf(confirm_string, "%s - %s", e->path, confirm_format);
-
-            // support user choice fstype when formatting external storage
-            // ensure fstype==auto because most devices with internal vfat storage cannot be formatted to other types
-            if (strcmp(e->type, "auto") == 0) {
-                format_sdcard(e->path);
-                continue;
-            }
->>>>>>> remote.cm.cm-11.0
 
             if (!confirm_selection(confirm_string, confirm))
                 continue;
